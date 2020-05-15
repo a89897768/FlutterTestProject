@@ -27,12 +27,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,9 +48,8 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Text("open new route"),
               textColor: Colors.blue,
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return TestRoute();
-                }));
+                _openTestRoute();
+                print("測試Log：繼續執行");
               },
             ),
           ],
@@ -69,22 +62,34 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
+  }
+
+  void _openTestRoute() async {
+    var returnValue =
+    await Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return TestRoute(tipText: "提示文字");
+    }));
+    print("測試Log：" + returnValue);
+  }
 }
 
 class TestRoute extends StatelessWidget {
+  final String tipText;
+
+  TestRoute({this.tipText});
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("TestRoute"),
-      ),
-      body: Center(
-        child: FlatButton(
-          child: Text("Pop Route"),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+    return Center(
+      child: FlatButton(
+        textColor: Colors.red,
+        onPressed: () => Navigator.pop(context, "返回文字"),
+        child: Text(tipText),
       ),
     );
   }
