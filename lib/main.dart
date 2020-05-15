@@ -10,6 +10,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
+      routes: {
+        ReturnValueRoute.ROUTE_NAME: (context) => ReturnValueRoute(
+            tipText: ModalRoute.of(context).settings.arguments),
+        NewRoute.ROUTE_NAME: (context) => NewRoute()
+      },
       home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
@@ -45,13 +50,14 @@ class _MyHomePageState extends State<MyHomePage> {
               style: Theme.of(context).textTheme.display1,
             ),
             FlatButton(
-              child: Text("open new route"),
-              textColor: Colors.blue,
-              onPressed: () {
-                _openTestRoute();
-                print("測試Log：繼續執行");
-              },
-            ),
+                child: Text("open new route"),
+                textColor: Colors.blue,
+                onPressed: () {
+                  String routeName = _counter % 2 == 0
+                      ? ReturnValueRoute.ROUTE_NAME
+                      : NewRoute.ROUTE_NAME;
+                  Navigator.pushNamed(context, routeName, arguments: "提示文字");
+                }),
           ],
         ),
       ),
@@ -68,20 +74,34 @@ class _MyHomePageState extends State<MyHomePage> {
       _counter++;
     });
   }
+}
 
-  void _openTestRoute() async {
-    var returnValue =
-    await Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return TestRoute(tipText: "提示文字");
-    }));
-    print("測試Log：" + returnValue);
+class NewRoute extends StatelessWidget {
+  static const String ROUTE_NAME = "NewRoute";
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("TestRoute"),
+      ),
+      body: Center(
+        child: FlatButton(
+          child: Text("Pop Route"),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
+    );
   }
 }
 
-class TestRoute extends StatelessWidget {
+class ReturnValueRoute extends StatelessWidget {
+  static const String ROUTE_NAME = "ReturnValueRoute";
   final String tipText;
 
-  TestRoute({this.tipText});
+  ReturnValueRoute({this.tipText});
 
   @override
   Widget build(BuildContext context) {
