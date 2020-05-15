@@ -10,10 +10,18 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
+      onGenerateRoute: (RouteSettings routeSettings) {
+        if (routeSettings.name == NewRoute.ROUTE_NAME) {
+          print("測試Log：透過onGenerateRoute生成");
+          return MaterialPageRoute(builder: (context) {
+            return NewRoute();
+          });
+        }
+        return null;
+      },
       routes: {
         ReturnValueRoute.ROUTE_NAME: (context) => ReturnValueRoute(
             tipText: ModalRoute.of(context).settings.arguments),
-        NewRoute.ROUTE_NAME: (context) => NewRoute()
       },
       home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
