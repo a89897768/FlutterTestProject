@@ -1,6 +1,24 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  FlutterError.onError = (FlutterErrorDetails details) {
+    print("捕捉FlutterError.onError");
+  };
+
+  runZoned(
+    () => runApp(MyApp()),
+    zoneSpecification: ZoneSpecification(
+      print: (Zone self, ZoneDelegate parent, Zone zone, String line) =>
+          parent.print(zone, "測試Log_捕捉Print：" + line),
+    ),
+    onError: (Object obj, StackTrace stack) {
+      print("測試Log_捕捉runZoned_onError");
+    },
+  );
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -31,6 +49,17 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _counter++;
     });
+
+    print("點擊「＋」");
+    if (_counter % 2 != 0) {
+      int.parse("source");
+    } else {
+      asyncErrorFunction();
+    }
+  }
+
+  void asyncErrorFunction() async {
+    Future.delayed(Duration(milliseconds: 100), () => int.parse("source"));
   }
 
   @override
