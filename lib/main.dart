@@ -10,6 +10,18 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
+      routes: {
+        ReturnValueRoute.ROUTE_NAME: (BuildContext context) =>
+            ReturnValueRoute(value: ModalRoute.of(context).settings.arguments),
+      },
+      onGenerateRoute: (RouteSettings settings) {
+        if (settings.name == NewRoute.ROUTE_NAME) {
+          print("測試Log_透過onGenerateRoute生成");
+          return MaterialPageRoute(
+              builder: (BuildContext context) => NewRoute());
+        }
+        return null;
+      },
       home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
@@ -25,14 +37,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,49 +47,90 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
             FlatButton(
-              child: Text("open new route"),
-              textColor: Colors.blue,
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return TestRoute();
-                }));
-              },
-            ),
+                child: Text("Navigator範例：Navigator.push"),
+                textColor: Colors.blue,
+                onPressed: () {
+                  //開啟NewRoute
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => NewRoute()));
+                }),
+            FlatButton(
+                child: Text("Route傳值範例"),
+                textColor: Colors.blue,
+                onPressed: () {
+                  _openReturnValueRoute();
+                  print("測試Log_繼續執行");
+                }),
+            FlatButton(
+                child: Text("Route命名範例"),
+                textColor: Colors.blue,
+                onPressed: () {
+                  Navigator.pushNamed(context, ReturnValueRoute.ROUTE_NAME,
+                      arguments: "arguments");
+                }),
+            FlatButton(
+                child: Text("onGenerateRoute範例"),
+                textColor: Colors.blue,
+                onPressed: () {
+                  Navigator.pushNamed(context, NewRoute.ROUTE_NAME);
+                }),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ),
     );
+  }
+
+  void _openReturnValueRoute() async {
+    var returnValue = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ReturnValueRoute(value: "建構時傳的值")));
+    print("測試Log_" + returnValue);
   }
 }
 
-class TestRoute extends StatelessWidget {
+class NewRoute extends StatelessWidget {
+  static const String ROUTE_NAME = "NewRoute";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("TestRoute"),
+        title: Text("NewRoute"),
       ),
       body: Center(
         child: FlatButton(
-          child: Text("Pop Route"),
+          child: Text("Navigator範例：Navigator.pop"),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
       ),
+    );
+  }
+}
+
+class ReturnValueRoute extends StatelessWidget {
+  static const String ROUTE_NAME = "ReturnValueRoute";
+
+  final String value;
+
+  ReturnValueRoute({this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(value, style: TextStyle(color: Colors.red)),
+            FlatButton(
+              textColor: Colors.black,
+              onPressed: () => Navigator.pop(context, "退出時回傳的值"),
+              child: Text("Navigator.pop(context, 退出時回傳的值)"),
+            )
+          ]),
     );
   }
 }
